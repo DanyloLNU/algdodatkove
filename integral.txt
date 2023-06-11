@@ -1,0 +1,63 @@
+
+#include "mainwindow.h"
+#include <QCoreApplication>
+#include <QMainWindow>
+#include <QFormLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPushButton>
+#include <iostream>
+#include <cmath>
+#include <QApplication>
+
+using namespace std;
+
+double f(double x){
+    return 3*x+2;
+}
+
+double findIntegral(float a, float b)
+{
+    float N = 50;
+    float h, S, x;
+    h = (b-a)/N;
+    S = 0;
+    for (int i = 0;i<N;i++)
+    {
+        x = a+i*h;
+        S += f(x);
+    }
+    S = h*S;
+    return S;
+}
+
+
+int main(int argc, char *argv[])
+{
+    QApplication a(argc, argv);
+    QMainWindow window;
+    QWidget *centralWidget = new QWidget(&window);
+    QFormLayout *formLayout = new QFormLayout(centralWidget);
+
+    QLabel *aLabel = new QLabel("a:");
+    QLineEdit *aLineEdit = new QLineEdit;
+    QLabel *bLabel = new QLabel("b:");
+    QLineEdit *bLineEdit = new QLineEdit;
+    QPushButton *calculateButton = new QPushButton("Calculate");
+    QLabel *resultLabel = new QLabel;
+
+    formLayout->addRow(aLabel, aLineEdit);
+    formLayout->addRow(bLabel, bLineEdit);
+    formLayout->addRow(calculateButton);
+    formLayout->addRow(resultLabel);
+    QObject::connect(calculateButton, &QPushButton::clicked, [&]() {
+        double a = aLineEdit->text().toDouble();
+        double b = bLineEdit->text().toDouble();
+        double root = findIntegral(a, b);
+        resultLabel->setText("Result: " + QString::number(root));
+
+    });
+    window.setCentralWidget(centralWidget);
+    window.show();
+    return a.exec();
+}

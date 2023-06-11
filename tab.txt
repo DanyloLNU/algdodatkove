@@ -1,0 +1,65 @@
+#include "mainwindow.h"
+#include <QVBoxLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QMessageBox>
+#include <cmath>
+#include <QTableWidget>
+#include <QTableWidgetItem>
+
+
+
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
+{
+    QWidget *centralWidget = new QWidget(this);
+    setCentralWidget(centralWidget);
+
+    QVBoxLayout *mainLayout = new QVBoxLayout(centralWidget);
+    mainLayout->setAlignment(Qt::AlignTop);
+
+    QLabel *functionLabel = new QLabel("Function: e^x + ln(x) - 10x");
+
+    tableWidget = new QTableWidget;
+    tableWidget->setRowCount(11); // Number of steps: (4 - 3) / 0.1 + 1 = 11
+    tableWidget->setColumnCount(2);
+    tableWidget->setHorizontalHeaderLabels(QStringList() << "x" << "f(x)");
+
+    mainLayout->addWidget(functionLabel);
+    mainLayout->addWidget(tableWidget);
+
+    QPushButton *calculateButton = new QPushButton("Calculate");
+    mainLayout->addWidget(calculateButton);
+
+    connect(calculateButton, &QPushButton::clicked, this, &MainWindow::calculate);
+}
+
+void MainWindow::calculate()
+{
+    double intervalStart = 3.0;
+    double intervalEnd = 4.0;
+    double stepSize = 0.1;
+
+    int numSteps = static_cast<int>((intervalEnd - intervalStart) / stepSize) + 1;
+
+    tableWidget->clearContents();
+
+    double x = intervalStart;
+    for (int i = 0; i < numSteps; ++i)
+    {
+        QTableWidgetItem *xItem = new QTableWidgetItem(QString::number(x));
+        tableWidget->setItem(i, 0, xItem);
+
+        double result = exp(x) + log(x) - 10 * x;
+        QTableWidgetItem *resultItem = new QTableWidgetItem(QString::number(result));
+        tableWidget->setItem(i, 1, resultItem);
+
+        x += stepSize;
+    }
+}
+
+void MainWindow::showError(const QString &message)
+{
+    QMessageBox::critical(this, "Error", message);
+}
